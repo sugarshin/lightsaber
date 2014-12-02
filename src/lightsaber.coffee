@@ -35,36 +35,98 @@ class Lightsaber
 
   AudioContext = window.AudioContext or window.webkitAudioContext
 
-  constructor: (audioPath, startBtn) ->
+  _isDeviceActivate = false
+
+  constructor: (arrayAudioPath, startBtn) ->
     @startBtn = startBtn
     @context = new AudioContext
-    @bufferLoader = new BufferLoader @context, [audioPath]
+    @bufferLoader = new BufferLoader @context, arrayAudioPath
     @bufferLoader.load()
+    @isPlaying = false
+    @isStart = false
     @events()
 
 
-  play: (buffer, vol) ->
-    source = @context.createBufferSource()
-    gainNode = @context.createGain()
+  soundPlay: (buffer, vol, loopSound) ->
+    # todo
+    if loopSound is true
+      loopSource = @context.createBufferSource()
+      loopGainNode = @context.createGain()
 
-    source.buffer = buffer
-    source.connect gainNode
+      loopSource.buffer = buffer
+      loopSource.connect loopGainNode
 
-    gainNode.connect @context.destination
-    gainNode.gain.value = if vol? then vol else 0
+      loopGainNode.connect @context.destination
+      loopGainNode.gain.value = if vol? then vol else 0
 
-    source.start 0
+      loopSource.loop = true
+      loopSource.start 0
+
+    @source = @context.createBufferSource()
+    @gainNode = @context.createGain()
+    console.log @source
+
+    @source.buffer = buffer
+    @source.connect @gainNode
+
+    @gainNode.connect @context.destination
+    @gainNode.gain.value = if vol? then vol else 0
+
+    if @isStart is false then @source.start 0
+
+    if @isPlaying is false and @isStart is true
+      @source.start 0
+      @isPlaying = true
+      @source.onended = (ev) => @isPlaying = false
+
+  shake: (event) =>
+    aig = event.accelerationIncludingGravity
+    # if 10 > aig.x > 5 or 10 > aig.y > 5 or 10 > aig.z > 5
+    #   @soundPlay @bufferLoader.bufferList[1], 1
+    if 20 > aig.x > 15 or 20 > aig.y > 15 or 20 > aig.z > 15
+      @soundPlay @bufferLoader.bufferList[2], 1
+    else if aig.x > 30 or aig.y > 30 or aig.z > 30
+      @soundPlay @bufferLoader.bufferList[3], 1
 
   rm: (el) -> el.parentNode.removeChild el
 
-  events: ->
-    window.addEventListener 'devicemotion', (ev) =>
-      aig = ev.accelerationIncludingGravity
-      if aig.x > 20 or aig.y > 20 or aig.z > 20
-        @play @bufferLoader.bufferList[0], 1
+  start: ->
+    @addMotionEvent()
+    @soundPlay @bufferLoader.bufferList[0], 1
+    # Loop
+    # @soundPlay @bufferLoader.bufferList[1], .2, true
+    @isStart = true
+    # todo
+    document
+      .getElementById 'sword'
+      .style.display = 'block'
 
+  end: ->
+    @rmMotionEvent()
+    @soundPlay @bufferLoader.bufferList[4], 1
+    @isStart = false
+    # todo
+    document
+      .getElementById 'sword'
+      .style.display = 'none'
+
+  toggle: ->
+    if @isStart is false
+      @start()
+    else
+      @end()
+
+  events: ->
     @startBtn.addEventListener 'click', =>
-      @play @bufferLoader.bufferList[0]
-      @rm @startBtn
+      if _isDeviceActivate is false
+        @soundPlay @bufferLoader.bufferList[0]
+        _isDeviceActivate = true
+      @toggle()
+
+  addEvent: (el, type, eventHandler) -> el.addEventListener type, eventHandler
+  rmEvent: (el, type, eventHandler) -> el.removeEventListener type, eventHandler
+
+  addMotionEvent: -> @addEvent window, 'devicemotion', @shake
+  rmMotionEvent: -> @rmEvent window, 'devicemotion', @shake
 
 window.Lightsaber or= Lightsaber

@@ -8,35 +8,57 @@
   <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
 
   <style>
+    html {
+        height: 100%;
+    }
     body {
       margin: 0;
-      background: #ecf0f1;
+      background: #fff;
+      /*background: #ecf0f1;*/
       color: #2c3e50;
       font-family: "Open Sans", sans-serif;
+      height: 100%;
     }
-    div {
+    .wrap {
+      height: 100%;
+    }
+    #start {
       text-align: center;
       position: absolute;
-      top: 50%;
+      bottom: 0;
       width: 100%;
-      -webkit-transform: translateY(-50%)
-      transform: translateY(-50%)
+    }
+    #sword {
+      width: 4%;
+      height: 100%;
+      background: #fff;
+      margin: 0 auto;
+      box-shadow: 0 0 14px 3px #15ffff;
+      display: none;
     }
     button {
       width: 50%;
       display: inline-block;
       font-size: 1.6em;
     }
+    img {
+      width: 10%;
+      height: auto;
+      vertical-align: bottom;
+    }
   </style>
 </head>
 <body>
-  <div>
-    <button id="start">start</button>
+  <div class="wrap">
+    <div id="sword"></div>
+    <div id="start">
+      <img src="../demo/handle.png" alt="">
+    </div>
   </div>
   <script src="../dest/lightsaber.js"></script>
   <script>
     !function(){
-      var lightsaber = new Lightsaber('../demo/clash.mp3', document.getElementById('start'));
+      var lightsaber = new Lightsaber(['../demo/start.mp3', '../demo/slow.mp3', '../demo/normal.mp3', '../demo/clash.mp3', '../demo/stop.mp3'], document.getElementById('start'));
     }();
   </script>
 </body>

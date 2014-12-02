@@ -1,5 +1,5 @@
 /*!
- * @license lightsaber v0.0.1
+ * @license lightsaber v0.0.2
  * (c) 2014 sugarshin https://github.com/sugarshin
  * License: MIT
  */
@@ -16,24 +16,25 @@
     }
 
     BufferLoader.prototype.loadBuffer = function(url, index) {
-      var loader, request;
+      var request;
       request = new XMLHttpRequest;
       request.open('GET', url, true);
       request.responseType = 'arraybuffer';
-      loader = this;
-      request.onload = function() {
-        return loader.context.decodeAudioData(request.response, (function(buffer) {
-          if (!buffer) {
-            alert('error decoding file data: ' + url);
-          }
-          loader.bufferList[index] = buffer;
-          if (++loader.loadCount === loader.urlList.length) {
-            return loader.onload(loader.bufferList);
-          }
-        }), function(err) {
-          return console.error(err);
-        });
-      };
+      request.onload = (function(_this) {
+        return function() {
+          return _this.context.decodeAudioData(request.response, function(buffer) {
+            if (!buffer) {
+              console.error(url);
+            }
+            _this.bufferList[index] = buffer;
+            if (++_this.loadCount === _this.urlList.length) {
+              return typeof _this.onload === "function" ? _this.onload(_this.bufferList) : void 0;
+            }
+          }, function(err) {
+            return console.error(err);
+          });
+        };
+      })(this);
       request.onerror = function() {
         return console.error('error');
       };
@@ -56,7 +57,9 @@
   })();
 
   Lightsaber = (function() {
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    var AudioContext;
+
+    AudioContext = window.AudioContext || window.webkitAudioContext;
 
     function Lightsaber(audioPath, startBtn) {
       this.startBtn = startBtn;
@@ -84,9 +87,9 @@
     Lightsaber.prototype.events = function() {
       window.addEventListener('devicemotion', (function(_this) {
         return function(ev) {
-          var ag;
-          ag = ev.accelerationIncludingGravity;
-          if (ag.x > 20 || ag.y > 20 || ag.z > 20) {
+          var aig;
+          aig = ev.accelerationIncludingGravity;
+          if (aig.x > 20 || aig.y > 20 || aig.z > 20) {
             return _this.play(_this.bufferLoader.bufferList[0], 1);
           }
         };

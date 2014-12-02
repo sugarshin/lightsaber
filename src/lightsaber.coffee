@@ -10,17 +10,14 @@ class BufferLoader
     request = new XMLHttpRequest
     request.open 'GET', url, true
     request.responseType = 'arraybuffer'
-    loader = @
 
-    request.onload = ->
-      loader.context.decodeAudioData request.response, ((buffer) ->
-        unless buffer
-          alert 'error decoding file data: ' + url
-        loader.bufferList[index] = buffer
-        if ++loader.loadCount is loader.urlList.length
-          loader.onload loader.bufferList
-      ), (err) ->
-        console.error err
+    request.onload = =>
+      @context.decodeAudioData request.response, (buffer) =>
+        unless buffer then console.error url
+        @bufferList[index] = buffer
+        if ++@loadCount is @urlList.length
+          @onload? @bufferList
+      , (err) -> console.error err
 
     request.onerror = -> console.error 'error'
 
@@ -34,10 +31,9 @@ class BufferLoader
 
 
 
-
 class Lightsaber
 
-  window.AudioContext = window.AudioContext or window.webkitAudioContext
+  AudioContext = window.AudioContext or window.webkitAudioContext
 
   constructor: (audioPath, startBtn) ->
     @startBtn = startBtn
@@ -63,8 +59,8 @@ class Lightsaber
 
   events: ->
     window.addEventListener 'devicemotion', (ev) =>
-      ag = ev.accelerationIncludingGravity
-      if ag.x > 20 or ag.y > 20 or ag.z > 20
+      aig = ev.accelerationIncludingGravity
+      if aig.x > 20 or aig.y > 20 or aig.z > 20
         @play @bufferLoader.bufferList[0], 1
 
     @startBtn.addEventListener 'click', =>

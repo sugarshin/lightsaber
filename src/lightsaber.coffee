@@ -1,3 +1,9 @@
+class Utility
+  addEvent: (el, type, eventHandler) -> el.addEventListener type, eventHandler
+  rmEvent: (el, type, eventHandler) -> el.removeEventListener type, eventHandler
+
+
+
 class BufferLoader
   constructor: (context, urlList, callback) ->
     @context = context
@@ -31,7 +37,7 @@ class BufferLoader
 
 
 
-class Lightsaber
+class Lightsaber extends Utility
 
   AudioContext = window.AudioContext or window.webkitAudioContext
 
@@ -64,7 +70,6 @@ class Lightsaber
 
     @source = @context.createBufferSource()
     @gainNode = @context.createGain()
-    console.log @source
 
     @source.buffer = buffer
     @source.connect @gainNode
@@ -122,9 +127,6 @@ class Lightsaber
         @soundPlay @bufferLoader.bufferList[0]
         _isDeviceActivate = true
       @toggle()
-
-  addEvent: (el, type, eventHandler) -> el.addEventListener type, eventHandler
-  rmEvent: (el, type, eventHandler) -> el.removeEventListener type, eventHandler
 
   addMotionEvent: -> @addEvent window, 'devicemotion', @shake
   rmMotionEvent: -> @rmEvent window, 'devicemotion', @shake

@@ -1,11 +1,28 @@
 /*!
- * @license lightsaber v1.0.0
+ * @license lightsaber v1.0.1
  * (c) 2014 sugarshin https://github.com/sugarshin
  * License: MIT
  */
 (function() {
-  var BufferLoader, Lightsaber,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var BufferLoader, Lightsaber, Utility,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  Utility = (function() {
+    function Utility() {}
+
+    Utility.prototype.addEvent = function(el, type, eventHandler) {
+      return el.addEventListener(type, eventHandler);
+    };
+
+    Utility.prototype.rmEvent = function(el, type, eventHandler) {
+      return el.removeEventListener(type, eventHandler);
+    };
+
+    return Utility;
+
+  })();
 
   BufferLoader = (function() {
     function BufferLoader(context, urlList, callback) {
@@ -57,8 +74,10 @@
 
   })();
 
-  Lightsaber = (function() {
+  Lightsaber = (function(_super) {
     var AudioContext, _isDeviceActivate;
+
+    __extends(Lightsaber, _super);
 
     AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -89,7 +108,6 @@
       }
       this.source = this.context.createBufferSource();
       this.gainNode = this.context.createGain();
-      console.log(this.source);
       this.source.buffer = buffer;
       this.source.connect(this.gainNode);
       this.gainNode.connect(this.context.destination);
@@ -156,14 +174,6 @@
       })(this));
     };
 
-    Lightsaber.prototype.addEvent = function(el, type, eventHandler) {
-      return el.addEventListener(type, eventHandler);
-    };
-
-    Lightsaber.prototype.rmEvent = function(el, type, eventHandler) {
-      return el.removeEventListener(type, eventHandler);
-    };
-
     Lightsaber.prototype.addMotionEvent = function() {
       return this.addEvent(window, 'devicemotion', this.shake);
     };
@@ -174,7 +184,7 @@
 
     return Lightsaber;
 
-  })();
+  })(Utility);
 
   window.Lightsaber || (window.Lightsaber = Lightsaber);
 

@@ -1,5 +1,5 @@
 /*!
- * @license lightsaber v1.0.1
+ * @license lightsaber v1.0.2
  * (c) 2014 sugarshin https://github.com/sugarshin
  * License: MIT
  */
@@ -34,13 +34,13 @@
     }
 
     BufferLoader.prototype.loadBuffer = function(url, index) {
-      var request;
-      request = new XMLHttpRequest;
-      request.open('GET', url, true);
-      request.responseType = 'arraybuffer';
-      request.onload = (function(_this) {
+      var req;
+      req = new XMLHttpRequest;
+      req.open('GET', url, true);
+      req.responseType = 'arraybuffer';
+      req.onload = (function(_this) {
         return function() {
-          return _this.context.decodeAudioData(request.response, function(buffer) {
+          return _this.context.decodeAudioData(req.response, function(buffer) {
             if (!buffer) {
               console.error(url);
             }
@@ -53,10 +53,10 @@
           });
         };
       })(this);
-      request.onerror = function() {
+      req.onerror = function() {
         return console.error('error');
       };
-      return request.send();
+      return req.send();
     };
 
     BufferLoader.prototype.load = function() {
@@ -95,17 +95,6 @@
     }
 
     Lightsaber.prototype.soundPlay = function(buffer, vol, loopSound) {
-      var loopGainNode, loopSource;
-      if (loopSound === true) {
-        loopSource = this.context.createBufferSource();
-        loopGainNode = this.context.createGain();
-        loopSource.buffer = buffer;
-        loopSource.connect(loopGainNode);
-        loopGainNode.connect(this.context.destination);
-        loopGainNode.gain.value = vol != null ? vol : 0;
-        loopSource.loop = true;
-        loopSource.start(0);
-      }
       this.source = this.context.createBufferSource();
       this.gainNode = this.context.createGain();
       this.source.buffer = buffer;
@@ -134,10 +123,6 @@
       } else if (aig.x > 30 || aig.y > 30 || aig.z > 30) {
         return this.soundPlay(this.bufferLoader.bufferList[3], 1);
       }
-    };
-
-    Lightsaber.prototype.rm = function(el) {
-      return el.parentNode.removeChild(el);
     };
 
     Lightsaber.prototype.start = function() {

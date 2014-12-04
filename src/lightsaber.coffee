@@ -13,21 +13,21 @@ class BufferLoader
     @loadCount = 0
 
   loadBuffer: (url, index) ->
-    request = new XMLHttpRequest
-    request.open 'GET', url, true
-    request.responseType = 'arraybuffer'
+    req = new XMLHttpRequest
+    req.open 'GET', url, true
+    req.responseType = 'arraybuffer'
 
-    request.onload = =>
-      @context.decodeAudioData request.response, (buffer) =>
+    req.onload = =>
+      @context.decodeAudioData req.response, (buffer) =>
         unless buffer then console.error url
         @bufferList[index] = buffer
         if ++@loadCount is @urlList.length
           @onload? @bufferList
       , (err) -> console.error err
 
-    request.onerror = -> console.error 'error'
+    req.onerror = -> console.error 'error'
 
-    request.send()
+    req.send()
 
   load: ->
     i = 0
@@ -52,22 +52,7 @@ class Lightsaber extends Utility
     @isStart = false
     @events()
 
-
   soundPlay: (buffer, vol, loopSound) ->
-    # todo
-    if loopSound is true
-      loopSource = @context.createBufferSource()
-      loopGainNode = @context.createGain()
-
-      loopSource.buffer = buffer
-      loopSource.connect loopGainNode
-
-      loopGainNode.connect @context.destination
-      loopGainNode.gain.value = if vol? then vol else 0
-
-      loopSource.loop = true
-      loopSource.start 0
-
     @source = @context.createBufferSource()
     @gainNode = @context.createGain()
 
@@ -92,8 +77,6 @@ class Lightsaber extends Utility
       @soundPlay @bufferLoader.bufferList[2], 1
     else if aig.x > 30 or aig.y > 30 or aig.z > 30
       @soundPlay @bufferLoader.bufferList[3], 1
-
-  rm: (el) -> el.parentNode.removeChild el
 
   start: ->
     @addMotionEvent()

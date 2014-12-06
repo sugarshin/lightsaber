@@ -41,8 +41,6 @@ class Lightsaber extends Utility
 
   AudioContext = window.AudioContext or window.webkitAudioContext
 
-  _isDeviceActivate = false
-
   constructor: (arrayAudioPath, startBtn) ->
     @startBtn = startBtn
     @context = new AudioContext
@@ -52,7 +50,7 @@ class Lightsaber extends Utility
     @isStart = false
     @events()
 
-  soundPlay: (buffer, vol, loopSound) ->
+  soundPlay: (buffer, vol) ->
     @source = @context.createBufferSource()
     @gainNode = @context.createGain()
 
@@ -62,6 +60,7 @@ class Lightsaber extends Utility
     @gainNode.connect @context.destination
     @gainNode.gain.value = if vol? then vol else 0
 
+    # todo: start用
     if @isStart is false then @source.start 0
 
     if @isPlaying is false and @isStart is true
@@ -79,10 +78,8 @@ class Lightsaber extends Utility
       @soundPlay @bufferLoader.bufferList[3], 1
 
   start: ->
-    @addMotionEvent()
     @soundPlay @bufferLoader.bufferList[0], 1
-    # Loop
-    # @soundPlay @bufferLoader.bufferList[1], .2, true
+    @addMotionEvent()
     @isStart = true
     # todo
     document
@@ -90,8 +87,8 @@ class Lightsaber extends Utility
       .style.display = 'block'
 
   end: ->
-    @rmMotionEvent()
     @soundPlay @bufferLoader.bufferList[4], 1
+    @rmMotionEvent()
     @isStart = false
     # todo
     document
@@ -104,12 +101,7 @@ class Lightsaber extends Utility
     else
       @end()
 
-  events: ->
-    @startBtn.addEventListener 'click', =>
-      if _isDeviceActivate is false
-        @soundPlay @bufferLoader.bufferList[0]
-        _isDeviceActivate = true
-      @toggle()
+  events: -> @addEvent @startBtn, 'click', => @toggle()
 
   addMotionEvent: -> @addEvent window, 'devicemotion', @shake
   rmMotionEvent: -> @rmEvent window, 'devicemotion', @shake

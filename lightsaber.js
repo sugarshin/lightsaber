@@ -1,5 +1,5 @@
 /*!
- * @license lightsaber v1.0.2
+ * @license lightsaber v1.0.3
  * (c) 2014 sugarshin https://github.com/sugarshin
  * License: MIT
  */
@@ -75,13 +75,11 @@
   })();
 
   Lightsaber = (function(_super) {
-    var AudioContext, _isDeviceActivate;
+    var AudioContext;
 
     __extends(Lightsaber, _super);
 
     AudioContext = window.AudioContext || window.webkitAudioContext;
-
-    _isDeviceActivate = false;
 
     function Lightsaber(arrayAudioPath, startBtn) {
       this.shake = __bind(this.shake, this);
@@ -94,7 +92,7 @@
       this.events();
     }
 
-    Lightsaber.prototype.soundPlay = function(buffer, vol, loopSound) {
+    Lightsaber.prototype.soundPlay = function(buffer, vol) {
       this.source = this.context.createBufferSource();
       this.gainNode = this.context.createGain();
       this.source.buffer = buffer;
@@ -126,15 +124,15 @@
     };
 
     Lightsaber.prototype.start = function() {
-      this.addMotionEvent();
       this.soundPlay(this.bufferLoader.bufferList[0], 1);
+      this.addMotionEvent();
       this.isStart = true;
       return document.getElementById('sword').style.display = 'block';
     };
 
     Lightsaber.prototype.end = function() {
-      this.rmMotionEvent();
       this.soundPlay(this.bufferLoader.bufferList[4], 1);
+      this.rmMotionEvent();
       this.isStart = false;
       return document.getElementById('sword').style.display = 'none';
     };
@@ -148,12 +146,8 @@
     };
 
     Lightsaber.prototype.events = function() {
-      return this.startBtn.addEventListener('click', (function(_this) {
+      return this.addEvent(this.startBtn, 'click', (function(_this) {
         return function() {
-          if (_isDeviceActivate === false) {
-            _this.soundPlay(_this.bufferLoader.bufferList[0]);
-            _isDeviceActivate = true;
-          }
           return _this.toggle();
         };
       })(this));

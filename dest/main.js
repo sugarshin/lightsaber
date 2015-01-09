@@ -1,14 +1,14 @@
 /*!
- * @license lightsaber v1.1.0
+ * @license lightsaber v1.1.1
  * (c) 2015 sugarshin https://github.com/sugarshin
  * License: MIT
  */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Lightsaber, lightsaber;
+var Lightsaber;
 
 Lightsaber = require('./lightsaber');
 
-lightsaber = new Lightsaber(['start.mp3', 'slow.mp3', 'normal.mp3', 'clash.mp3', 'stop.mp3'], document.getElementById('start'));
+new Lightsaber(['start.mp3', 'slow.mp3', 'normal.mp3', 'clash.mp3', 'stop.mp3'], document.getElementById('start'));
 
 
 
@@ -70,32 +70,31 @@ module.exports = Mixin = (function() {
 var BufferLoader;
 
 module.exports = BufferLoader = (function() {
-  function BufferLoader(context, urlList, callback) {
+  function BufferLoader(context, urlList) {
     this.context = context;
     this.urlList = urlList;
-    this.onload = callback;
     this.bufferList = [];
-    this.loadCount = 0;
   }
 
   BufferLoader.prototype.loadBuffer = function(url, index) {
-    var req;
+    var ondecodeerror, ondecodesuccess, req;
     req = new XMLHttpRequest;
     req.open('GET', url, true);
     req.responseType = 'arraybuffer';
+    ondecodesuccess = (function(_this) {
+      return function(buffer) {
+        if (!buffer) {
+          console.error(url);
+        }
+        return _this.bufferList[index] = buffer;
+      };
+    })(this);
+    ondecodeerror = function(err) {
+      return console.error(err);
+    };
     req.onload = (function(_this) {
       return function() {
-        return _this.context.decodeAudioData(req.response, function(buffer) {
-          if (!buffer) {
-            console.error(url);
-          }
-          _this.bufferList[index] = buffer;
-          if (++_this.loadCount === _this.urlList.length) {
-            return typeof _this.onload === "function" ? _this.onload(_this.bufferList) : void 0;
-          }
-        }, function(err) {
-          return console.error(err);
-        });
+        return _this.context.decodeAudioData(req.response, ondecodesuccess, ondecodeerror);
       };
     })(this);
     req.onerror = function() {
@@ -105,12 +104,12 @@ module.exports = BufferLoader = (function() {
   };
 
   BufferLoader.prototype.load = function() {
-    var i, _results;
-    i = 0;
+    var i, url, _i, _len, _ref, _results;
+    _ref = this.urlList;
     _results = [];
-    while (i < this.urlList.length) {
-      this.loadBuffer(this.urlList[i], i);
-      _results.push(++i);
+    for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+      url = _ref[i];
+      _results.push(this.loadBuffer(url, i));
     }
     return _results;
   };
@@ -139,8 +138,8 @@ module.exports = Lightsaber = (function() {
   AudioContext = window.AudioContext || window.webkitAudioContext;
 
   function Lightsaber(arrayAudioPath, startBtn) {
-    this.shake = __bind(this.shake, this);
     this.startBtn = startBtn;
+    this.onShake = __bind(this.onShake, this);
     this.context = new AudioContext;
     this.bufferLoader = new BufferLoader(this.context, arrayAudioPath);
     this.bufferLoader.load();
@@ -170,16 +169,6 @@ module.exports = Lightsaber = (function() {
     }
   };
 
-  Lightsaber.prototype.shake = function(event) {
-    var aig, _ref, _ref1, _ref2;
-    aig = event.accelerationIncludingGravity;
-    if ((20 > (_ref = aig.x) && _ref > 15) || (20 > (_ref1 = aig.y) && _ref1 > 15) || (20 > (_ref2 = aig.z) && _ref2 > 15)) {
-      return this.soundPlay(this.bufferLoader.bufferList[2], 1);
-    } else if (aig.x > 30 || aig.y > 30 || aig.z > 30) {
-      return this.soundPlay(this.bufferLoader.bufferList[3], 1);
-    }
-  };
-
   Lightsaber.prototype.start = function() {
     this.soundPlay(this.bufferLoader.bufferList[0], 1);
     this.addMotionEvent();
@@ -202,6 +191,16 @@ module.exports = Lightsaber = (function() {
     }
   };
 
+  Lightsaber.prototype.onShake = function(event) {
+    var aig, _ref, _ref1, _ref2;
+    aig = event.accelerationIncludingGravity;
+    if ((20 > (_ref = aig.x) && _ref > 15) || (20 > (_ref1 = aig.y) && _ref1 > 15) || (20 > (_ref2 = aig.z) && _ref2 > 15)) {
+      return this.soundPlay(this.bufferLoader.bufferList[2], 1);
+    } else if (aig.x > 30 || aig.y > 30 || aig.z > 30) {
+      return this.soundPlay(this.bufferLoader.bufferList[3], 1);
+    }
+  };
+
   Lightsaber.prototype.events = function() {
     return this.addEvent(this.startBtn, 'click', (function(_this) {
       return function() {
@@ -211,11 +210,11 @@ module.exports = Lightsaber = (function() {
   };
 
   Lightsaber.prototype.addMotionEvent = function() {
-    return this.addEvent(window, 'devicemotion', this.shake);
+    return this.addEvent(window, 'devicemotion', this.onShake);
   };
 
   Lightsaber.prototype.rmMotionEvent = function() {
-    return this.rmEvent(window, 'devicemotion', this.shake);
+    return this.rmEvent(window, 'devicemotion', this.onShake);
   };
 
   return Lightsaber;
@@ -230,12 +229,12 @@ var Utility;
 module.exports = Utility = (function() {
   function Utility() {}
 
-  Utility.addEvent = function(el, type, eventHandler) {
-    return el.addEventListener(type, eventHandler);
+  Utility.addEvent = function(el, type, handler) {
+    return el.addEventListener(type, handler);
   };
 
-  Utility.rmEvent = function(el, type, eventHandler) {
-    return el.removeEventListener(type, eventHandler);
+  Utility.rmEvent = function(el, type, handler) {
+    return el.removeEventListener(type, handler);
   };
 
   return Utility;

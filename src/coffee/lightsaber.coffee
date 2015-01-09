@@ -10,8 +10,7 @@ module.exports =
 
     AudioContext = window.AudioContext or window.webkitAudioContext
 
-    constructor: (arrayAudioPath, startBtn) ->
-      @startBtn = startBtn
+    constructor: (arrayAudioPath, @startBtn) ->
       @context = new AudioContext
       @bufferLoader = new BufferLoader @context, arrayAudioPath
       @bufferLoader.load()
@@ -37,7 +36,31 @@ module.exports =
         @isPlaying = true
         @source.onended = (ev) => @isPlaying = false
 
-    shake: (event) =>
+    start: ->
+      @soundPlay @bufferLoader.bufferList[0], 1
+      @addMotionEvent()
+      @isStart = true
+      # todo
+      document
+      .getElementById 'sword'
+      .style.display = 'block'
+
+    end: ->
+      @soundPlay @bufferLoader.bufferList[4], 1
+      @rmMotionEvent()
+      @isStart = false
+      # todo
+      document
+      .getElementById 'sword'
+      .style.display = 'none'
+
+    toggle: ->
+      if @isStart is false
+        @start()
+      else
+        @end()
+
+    onShake: (event) =>
       aig = event.accelerationIncludingGravity
       # if 10 > aig.x > 5 or 10 > aig.y > 5 or 10 > aig.z > 5
       #   @soundPlay @bufferLoader.bufferList[1], 1
@@ -46,31 +69,7 @@ module.exports =
       else if aig.x > 30 or aig.y > 30 or aig.z > 30
         @soundPlay @bufferLoader.bufferList[3], 1
 
-    start: ->
-      @soundPlay @bufferLoader.bufferList[0], 1
-      @addMotionEvent()
-      @isStart = true
-      # todo
-      document
-        .getElementById 'sword'
-        .style.display = 'block'
-
-    end: ->
-      @soundPlay @bufferLoader.bufferList[4], 1
-      @rmMotionEvent()
-      @isStart = false
-      # todo
-      document
-        .getElementById 'sword'
-        .style.display = 'none'
-
-    toggle: ->
-      if @isStart is false
-        @start()
-      else
-        @end()
-
     events: -> @addEvent @startBtn, 'click', => @toggle()
 
-    addMotionEvent: -> @addEvent window, 'devicemotion', @shake
-    rmMotionEvent: -> @rmEvent window, 'devicemotion', @shake
+    addMotionEvent: -> @addEvent window, 'devicemotion', @onShake
+    rmMotionEvent: -> @rmEvent window, 'devicemotion', @onShake

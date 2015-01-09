@@ -1,31 +1,26 @@
 module.exports =
   class BufferLoader
-    constructor: (context, urlList, callback) ->
-      @context = context
-      @urlList = urlList
-      @onload = callback
+    constructor: (@context, @urlList) ->
       @bufferList = []
-      @loadCount = 0
 
     loadBuffer: (url, index) ->
       req = new XMLHttpRequest
       req.open 'GET', url, true
       req.responseType = 'arraybuffer'
 
+      ondecodesuccess = (buffer) =>
+        unless buffer then console.error url
+        @bufferList[index] = buffer
+
+      ondecodeerror = (err) -> console.error err
+
       req.onload = =>
-        @context.decodeAudioData req.response, (buffer) =>
-          unless buffer then console.error url
-          @bufferList[index] = buffer
-          if ++@loadCount is @urlList.length
-            @onload? @bufferList
-        , (err) -> console.error err
+        @context.decodeAudioData req.response, ondecodesuccess, ondecodeerror
 
       req.onerror = -> console.error 'error'
 
       req.send()
 
     load: ->
-      i = 0
-      while i < @urlList.length
-        @loadBuffer @urlList[i], i
-        ++i
+      for url, i in @urlList
+        @loadBuffer url, i

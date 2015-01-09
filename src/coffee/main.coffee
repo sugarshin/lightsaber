@@ -1,7 +1,8 @@
 Lightsaber = require './lightsaber'
 
 
-lightsaber = new Lightsaber [
+
+new Lightsaber [
   'start.mp3'
   'slow.mp3'
   'normal.mp3'

@@ -12,4 +12,22 @@
 
 Please be access in mobile
 
-[http://sugarshin.github.io/lightsaber/demo/](//sugarshin.github.io/lightsaber/demo/)
+[http://sugarshin.github.io/lightsaber/](//sugarshin.github.io/lightsaber/)
+
+## Contributing
+
+[gulp.js](//gulpjs.com/)
+
+[CoffeeScript](//coffeescript.org/)
+
+```shell
+git submodule update --init
+
+npm i
+```
+
+## License
+
+MIT
+
+© sugarshin

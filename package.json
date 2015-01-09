@@ -11,7 +11,6 @@
     "browserify": "^8.1.0",
     "coffee-script": "^1.8.0",
     "coffeeify": "^1.0.0",
-    "debowerify": "^1.2.0",
     "gulp": "^3.8.10",
     "gulp-bump": "^0.1.11",
     "gulp-header": "^1.2.2",

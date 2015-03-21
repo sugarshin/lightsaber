@@ -1,6 +1,13 @@
+###!
+ * @license lightsaber
+ * (c) sugarshin
+ * License: MIT
+###
+
+"use strict"
+
+require('insert-css') require '../index.styl'
 Lightsaber = require './lightsaber'
-
-
 
 new Lightsaber [
   'start.mp3'

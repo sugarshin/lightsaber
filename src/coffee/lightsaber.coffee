@@ -1,6 +1,6 @@
 "use strict"
 
-util = require './util'
+{ addEvent, rmEvent } = require './util'
 BufferLoader = require './bufferloader'
 
 module.exports =
@@ -67,7 +67,7 @@ class Lightsaber
     else if aig.x > 30 or aig.y > 30 or aig.z > 30
       @soundPlay @bufferLoader.bufferList[3], 1
 
-  events: -> util.addEvent @startBtn, 'click', => @toggle()
+  events: -> addEvent @startBtn, 'click', => @toggle()
 
-  addMotionEvent: -> util.addEvent window, 'devicemotion', @onShake
-  rmMotionEvent: -> util.rmEvent window, 'devicemotion', @onShake
+  addMotionEvent: -> addEvent window, 'devicemotion', @onShake
+  rmMotionEvent: -> rmEvent window, 'devicemotion', @onShake

@@ -14,25 +14,10 @@ Please be access in mobile
 
 [http://sugarshin.github.io/lightsaber/](//sugarshin.github.io/lightsaber/)
 
-## Contributing
-
-* beefy
-* browserify
-* coffeeify
-* jade
-* replace
-* uglify-js
-
-```shell
-npm i
-
-npm start
-
-npm run build
-```
-
 ## License
 
-MIT
+[MIT][license-url]
 
 © sugarshin
+
+[license-url]: http://sugarshin.mit-license.org/

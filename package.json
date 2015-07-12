@@ -1,31 +1,37 @@
 {
   "name": "lightsaber",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Lightsaber",
   "homepage": "https://github.com/sugarshin",
-  "repository": "sugarshin/lightsaber",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:sugarshin/lightsaber.git"
+  },
+  "private": true,
   "author": "sugarshin",
   "license": "MIT",
   "scripts": {
-    "start": "npm run jade && npm run browserify && beefy ./src/coffee/main.coffee --cwd dest --live --open -- -t coffeeify -t stylify --extension='.coffee'",
+    "start": "npm run jade && budo ./src/coffee/main.coffee:./dest/main.js --dir=dest --live -v -- -t coffeeify -t stylify --extension='.coffee' | garnish",
     "jade": "jade src/ -o dest/",
     "browserify": "browserify -t coffeeify -t stylify --extension='.coffee' ./src/coffee/main.coffee -o ./dest/main.js",
     "replace-min": "replace 'main.js' 'main.min.js' dest/index.html",
     "uglify": "uglifyjs dest/main.js -m -c warnings=false --comments '/\\/*!/' -o dest/main.min.js",
     "build": "npm run jade && npm run browserify && npm run uglify && npm run replace-min",
-    "deploy": "git subtree push --prefix=dest/ origin gh-pages --squash"
-  },
-  "devDependencies": {
-    "beefy": "^2.1.3",
-    "browserify": "^9.0.3",
-    "coffeeify": "^1.0.0",
-    "jade": "^1.9.2",
-    "replace": "^0.3.0",
-    "uglify-js": "^2.4.17"
+    "deploy": "git subtree push -P dest origin gh-pages --squash"
   },
   "dependencies": {
-    "insert-css": "^0.2.0",
+    "insert-css": "^0.2.0"
+  },
+  "devDependencies": {
+    "browserify": "^10.2.6",
+    "budo": "^4.1.0",
+    "coffeeify": "^1.1.0",
+    "garnish": "^2.1.3",
+    "jade": "^1.11.0",
     "nib": "^1.1.0",
-    "stylify": "^1.2.0"
+    "replace": "^0.3.0",
+    "stylify": "^1.2.0",
+    "uglify-js": "^2.4.23",
+    "watchify": "^3.2.3"
   }
 }

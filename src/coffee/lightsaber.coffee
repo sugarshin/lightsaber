@@ -3,10 +3,10 @@
 { addEvent, rmEvent } = require './util'
 BufferLoader = require './bufferloader'
 
+AudioContext = window.AudioContext or window.webkitAudioContext
+
 module.exports =
 class Lightsaber
-
-  AudioContext = window.AudioContext or window.webkitAudioContext
 
   constructor: (arrayAudioPath, @startBtn) ->
     @context = new AudioContext

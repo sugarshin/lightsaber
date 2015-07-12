@@ -2,6 +2,7 @@
 
 module.exports =
 class BufferLoader
+
   constructor: (@context, @urlList) ->
     @bufferList = []
 
@@ -11,15 +12,15 @@ class BufferLoader
     req.responseType = 'arraybuffer'
 
     ondecodesuccess = (buffer) =>
-      unless buffer then console.error url
+      unless buffer then return console.log 'ondecodesuccess', url
       @bufferList[index] = buffer
 
-    ondecodeerror = (err) -> console.error err
+    ondecodeerror = (err) -> console.log 'ondecodeerror', err
 
     req.onload = =>
       @context.decodeAudioData req.response, ondecodesuccess, ondecodeerror
 
-    req.onerror = -> console.error 'error'
+    req.onerror = (err) -> console.log 'req.onload', err
 
     req.send()
 
